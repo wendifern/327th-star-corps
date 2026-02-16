@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>327th Star Corps</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #facc15;
+      letter-spacing: 3px;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #facc15;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: #facc15;
+      color: #000;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-right: 10px;
+      transition: opacity 0.3s;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #facc15;
+      color: #facc15;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    input:focus {
+      outline: 2px solid #facc15;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 10px;
+    }
+
+    .event {
+      background: #000;
+      border: 1px solid #facc15;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .success {
+      color: #22c55e;
+      padding: 10px;
+      background: rgba(34, 197, 94, 0.1);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .error {
+      color: #ef4444;
+      padding: 10px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .warning {
+      color: #f59e0b;
+      padding: 10px;
+      background: rgba(245, 158, 11, 0.1);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid #222;
+      color: #777;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid #facc15;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>327th Star Corps</h1>
+    <p style="text-align:center;">Elite Virtual Regiment | VRChat Military Roleplay Unit</p>
+
+    <!-- Links -->
+    <div class="card">
+      <h2>Join Our Community</h2>
+      <button class="btn" onclick="window.open('https://discord.gg/5cE7HrUNyx','_blank')">Join Discord</button>
+      <button class="btn btn-outline" onclick="window.open('https://vrchat.com/home/group/327TH.8257','_blank')">VRChat Group</button>
+    </div>
+
+    <!-- Schedule -->
+    <div class="card">
+      <h2>Interactive Schedule</h2>
+      <div id="events" class="grid-2"></div>
+
+      <h3>Add Event</h3>
+      <div class="grid-2">
+        <input type="date" id="eventDate" />
+        <input type="text" id="eventTitle" placeholder="Event Title" />
+        <input type="text" id="eventTime" placeholder="Time (ex: 7:00 PM EST)" />
+        <button class="btn" onclick="addEvent()">Add Event</button>
+      </div>
+    </div>
+
+    <!-- Recruitment -->
+    <div class="card">
+      <h2>Recruitment Application</h2>
+      <div id="formMessage"></div>
+      <div class="grid-2">
+        <input type="text" id="discord" placeholder="Discord Username (required)" />
+        <input type="text" id="vrchat" placeholder="VRChat Username (required)" />
+        <input type="number" id="age" placeholder="Age (required)" min="13" />
+        <input type="text" id="timezone" placeholder="Timezone (ex: EST)" />
+      </div>
+      <input type="text" id="experience" placeholder="Previous Milsim / RP Experience" />
+      <button class="btn" id="submitBtn" onclick="submitApplication()">Submit Application</button>
+    </div>
+
+    <footer>
+      © 2026 327th Star Corps | VRChat Military Unit
+    </footer>
+  </div>
+
+  <script type="text/javascript">
+    const API_URL = '/api';
+
+    const events = [
+      { date: '2026-02-20', title: 'Squad Training', time: '7:00 PM EST' },
+      { date: '2026-02-23', title: 'Deployment Operation', time: '8:00 PM EST' }
+    ];
+
+    function renderEvents() {
+      const container = document.getElementById('events');
+      container.innerHTML = '';
+      events.forEach(event => {
+        const div = document.createElement('div');
+        div.className = 'event';
+        div.innerHTML = `<strong>${event.title}</strong><br>${event.date}<br>${event.time}`;
+        container.appendChild(div);
+      });
+    }
+
+    function addEvent() {
+      const date = document.getElementById('eventDate').value;
+      const title = document.getElementById('eventTitle').value;
+      const time = document.getElementById('eventTime').value;
+
+      if (!date || !title || !time) {
+        showMessage('Please fill out all event fields.', 'warning');
+        return;
+      }
+
+      events.push({ date, title, time });
+      renderEvents();
+      document.getElementById('eventDate').value = '';
+      document.getElementById('eventTitle').value = '';
+      document.getElementById('eventTime').value = '';
+      showMessage('Event added successfully!', 'success');
+    }
+
+    function showMessage(message, type = 'error') {
+      const messageDiv = document.getElementById('formMessage');
+      messageDiv.innerHTML = `<p class="${type}">${message}</p>`;
+    }
+
+    async function submitApplication() {
+      const discord = document.getElementById('discord').value.trim();
+      const vrchat = document.getElementById('vrchat').value.trim();
+      const age = document.getElementById('age').value.trim();
+      const timezone = document.getElementById('timezone').value.trim();
+      const experience = document.getElementById('experience').value.trim();
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Clear previous message
+      document.getElementById('formMessage').innerHTML = '';
+
+      // Client-side validation
+      if (!discord || !vrchat || !age) {
+        showMessage('Please fill out all required fields.', 'error');
+        return;
+      }
+
+      if (isNaN(age) || age < 13) {
+        showMessage('Age must be 13 or older.', 'error');
+        return;
+      }
+
+      // Disable button and show loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="loader"></span> Submitting...';
+
+      try {
+        const response = await fetch(`${API_URL}/submit-application`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            discord,
+            vrchat,
+            age,
+            timezone,
+            experience,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errorMessage = data.errors?.join(', ') || data.message || 'Error submitting application.';
+          showMessage(errorMessage, 'error');
+          return;
+        }
+
+        showMessage(data.message, 'success');
+        document.querySelectorAll('input').forEach(input => input.value = '');
+      } catch (error) {
+        console.error('Submission error:', error);
+        showMessage('Network error. Please try again later.', 'error');
+      } finally {
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit Application';
+      }
+    }
+
+    renderEvents();
+  </script>
+</body>
+</html>
